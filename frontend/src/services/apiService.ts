@@ -13,7 +13,11 @@ export default {
     return data;
   },
   getNursePreferences: async (id: number) => {
-    const { data } = await instance.get(`/nurses/preferences`);
+    const { data } = await instance.get(`/nurses/preferences`, {
+      params: {
+        id,
+      },
+    });
     return data;
   },
   setNursePreferences: async (id: number, preferences: unknown) => {

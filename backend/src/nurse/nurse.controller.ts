@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from "@nestjs/common";
+import { Controller, Get, Post, Body, Query } from "@nestjs/common";
 import { NurseService } from "./nurse.service";
 import { NurseEntity } from "./nurse.entity";
 
@@ -21,7 +21,7 @@ export class NurseController {
   }
 
   @Get("preferences")
-  async getPreferences(@Body("id") id: number): Promise<any> {
+  async getPreferences(@Query("id") id: number): Promise<any> {
     return this.nurseService.getPreferences(id);
   }
 }
