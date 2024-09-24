@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as api from "../services/apiService";
 
 const NursePreferences = ({ id, name, days }) => {
@@ -23,13 +23,12 @@ const NursePreferences = ({ id, name, days }) => {
 
   const handleSubmitPreferences = (event) => {
     const setPreferences = async () => {
-      const shiftValues = Object.values(preferredShifts);
+      const shiftValues = Object.values(nursePreferredShifts);
       let shiftsToPost = shiftValues.map((shift, ind) => {
         return { dayOfWeek: days[ind], shift: shift };
       });
       shiftsToPost = shiftsToPost.filter((shiftDict) => shiftDict.shift !== "");
-      // TODO: call the API to submit preferences
-      console.error("Not yet implemented");
+      return api.default.setNursePreferences(id, JSON.stringify(shiftsToPost));
     };
     event.preventDefault();
     setPreferences().catch(console.error);
