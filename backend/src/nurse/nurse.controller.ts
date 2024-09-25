@@ -10,18 +10,4 @@ export class NurseController {
   async getNurses(): Promise<NurseEntity[]> {
     return this.nurseService.getNurses();
   }
-
-  @Post("preferences")
-  async setPreferences(
-    @Body("id") id: number,
-    @Body("preferences") preferences: string
-  ): Promise<any> {
-    const parsedPreferences = JSON.parse(preferences);
-    return this.nurseService.setPreferences(id, parsedPreferences);
-  }
-
-  @Get("preferences")
-  async getPreferences(@Query("id") id: number): Promise<any> {
-    return this.nurseService.getPreferences(id);
-  }
 }
