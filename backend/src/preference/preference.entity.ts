@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { NurseEntity } from "../nurse/nurse.entity";
-import { ShiftType } from "../shift/shift.entity";
+import { DayOfWeek, ShiftType } from "../shift/shift.entity";
 
 @Entity("preferences")
 export class PreferenceEntity {
@@ -8,7 +8,7 @@ export class PreferenceEntity {
   id: number;
 
   @Column({ type: "varchar", length: 10 })
-  dayOfWeek: string;
+  dayOfWeek: DayOfWeek;
 
   @Column({ type: "varchar", length: 10 })
   shiftType: ShiftType;

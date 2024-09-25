@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Body, Param } from "@nestjs/common";
 import { PreferenceService } from "./preference.service";
 import { PreferenceEntity } from "./preference.entity";
-import { ShiftType } from "../shift/shift.entity";
+import { DayOfWeek, ShiftType } from "../shift/shift.entity";
 
 @Controller("preferences")
 export class PreferenceController {
@@ -11,7 +11,7 @@ export class PreferenceController {
   async setPreferences(
     @Param("nurseId") nurseId: number,
     @Body("preferences")
-    preferences: { dayOfWeek: string; shiftType: ShiftType }[] // Use ShiftType for validation
+    preferences: { dayOfWeek: DayOfWeek; shiftType: ShiftType }[] // Use ShiftType for validation
   ): Promise<PreferenceEntity[]> {
     return this.preferenceService.setPreferences(nurseId, preferences);
   }

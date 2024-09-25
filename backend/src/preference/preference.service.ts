@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { PreferenceEntity } from "./preference.entity";
 import { NurseEntity } from "../nurse/nurse.entity";
-import { ShiftType } from "../shift/shift.entity";
+import { DayOfWeek, ShiftType } from "../shift/shift.entity";
 
 @Injectable()
 export class PreferenceService {
@@ -17,7 +17,7 @@ export class PreferenceService {
 
   async setPreferences(
     nurseId: number,
-    preferences: { dayOfWeek: string; shiftType: ShiftType }[]
+    preferences: { dayOfWeek: DayOfWeek; shiftType: ShiftType }[]
   ): Promise<PreferenceEntity[]> {
     const nurse = await this.nurseRepository.findOneByOrFail({ id: nurseId });
     if (!nurse) {
