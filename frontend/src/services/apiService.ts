@@ -12,17 +12,14 @@ export default {
     const { data } = await instance.get("/nurses");
     return data;
   },
-  getNursePreferences: async (id: number) => {
-    const { data } = await instance.get(`/nurses/preferences`, {
-      params: {
-        id,
-      },
-    });
+
+  // Preferences endpoints
+  getNursePreferences: async (nurseId: number) => {
+    const { data } = await instance.get(`/preferences/${nurseId}`);
     return data;
   },
-  setNursePreferences: async (id: number, preferences: unknown) => {
-    const { data } = await instance.post(`/nurses/preferences`, {
-      id,
+  setNursePreferences: async (nurseId: number, preferences: unknown) => {
+    const { data } = await instance.post(`/preferences/${nurseId}`, {
       preferences,
     });
     return data;

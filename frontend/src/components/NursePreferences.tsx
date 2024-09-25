@@ -22,15 +22,19 @@ const NursePreferences = ({ id, name, days }) => {
   };
 
   const handleSubmitPreferences = (event) => {
+    event.preventDefault();
+
     const setPreferences = async () => {
       const shiftValues = Object.values(nursePreferredShifts);
       let shiftsToPost = shiftValues.map((shift, ind) => {
-        return { dayOfWeek: days[ind], shift: shift };
+        return { dayOfWeek: days[ind], shiftType: shift };
       });
-      shiftsToPost = shiftsToPost.filter((shiftDict) => shiftDict.shift !== "");
-      return api.default.setNursePreferences(id, JSON.stringify(shiftsToPost));
+      shiftsToPost = shiftsToPost.filter(
+        (shiftDict) => shiftDict.shiftType !== ""
+      );
+      return api.default.setNursePreferences(id, shiftsToPost);
     };
-    event.preventDefault();
+
     setPreferences().catch(console.error);
   };
 
@@ -38,9 +42,11 @@ const NursePreferences = ({ id, name, days }) => {
     // converts the preferences from the API to the format that is used in the state of nursePreferredShifts
     const fetchPreferences = async () => {
       let nursePreferences = await api.default.getNursePreferences(id);
+
       if (!nursePreferences) {
         nursePreferences = [];
       }
+
       const newPreferredShifts = {
         Monday: "",
         Tuesday: "",
@@ -50,11 +56,15 @@ const NursePreferences = ({ id, name, days }) => {
         Saturday: "",
         Sunday: "",
       };
+
       nursePreferences.forEach((nursePreference) => {
-        newPreferredShifts[nursePreference.dayOfWeek] = nursePreference.shift;
+        newPreferredShifts[nursePreference.dayOfWeek] =
+          nursePreference.shiftType;
       });
+
       setNursePreferredShifts(newPreferredShifts);
     };
+
     fetchPreferences().catch(console.error);
   }, [id]);
 
