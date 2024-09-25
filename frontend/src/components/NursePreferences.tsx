@@ -58,21 +58,6 @@ const NursePreferences = ({ id, name, days }) => {
     fetchPreferences().catch(console.error);
   }, [id]);
 
-  // changing the preferredShifts in the page depending on the checkboxes
-  const handleChange = (event) => {
-    for (const child of Array.from(event.currentTarget.children)) {
-      if (child.type == "checkbox" && child.checked) {
-        setNursePreferredShifts({
-          ...nursePreferredShifts,
-          [child.name]: child.value,
-        });
-        break;
-      } else if (child.type == "checkbox") {
-        setNursePreferredShifts({ ...nursePreferredShifts, [child.name]: "" });
-      }
-    }
-  };
-
   return (
     <div>
       <button onClick={handleClick}>{name}</button>
@@ -91,31 +76,28 @@ const NursePreferences = ({ id, name, days }) => {
                 {days.map((day) => (
                   <tr key={"preference for " + day + " nurse with id " + id}>
                     <td>{day}</td>
-                    <td onChange={handleChange}>
-                      {nursePreferredShifts[day] === shifts[0] ? (
-                        <input
-                          type="checkbox"
-                          name={day}
-                          value={shifts[0]}
-                          checked
-                        />
-                      ) : (
-                        <input type="checkbox" name={day} value={shifts[0]} />
-                      )}
-                      <label htmlFor={shifts[0]} style={{ marginRight: "5px" }}>
-                        {shifts[0]}
-                      </label>
-                      {nursePreferredShifts[day] === shifts[1] ? (
-                        <input
-                          type="checkbox"
-                          name={day}
-                          value={shifts[1]}
-                          checked
-                        />
-                      ) : (
-                        <input type="checkbox" name={day} value={shifts[1]} />
-                      )}
-                      <label htmlFor={shifts[1]}>{shifts[1]}</label>
+                    <td>
+                      {shifts.map((shift) => (
+                        <span key={shift}>
+                          <input
+                            type="checkbox"
+                            name={day}
+                            value={shift}
+                            checked={nursePreferredShifts[day] === shift}
+                            onChange={(e) => {
+                              setNursePreferredShifts({
+                                ...nursePreferredShifts,
+                                [day]: e.target.checked ? e.target.value : "",
+                              });
+                            }}
+                          />
+
+                          <label htmlFor={shift} style={{ marginRight: "5px" }}>
+                            {shift}
+                          </label>
+                        </span>
+                      ))}
+
                       <br />
                     </td>
                   </tr>
