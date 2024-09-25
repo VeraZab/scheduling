@@ -27,9 +27,6 @@ export class ScheduleController {
     @Body("startDate") startDate: Date,
     @Body("endDate") endDate: Date
   ): Promise<any> {
-    // TODO: Complete the implementation of this method
-    // Each time this method is called, a new schedule should be generated
-    // based on current nurse preferences and schedule requirements for the given dates
-    throw new NotImplementedException();
+    return this.scheduleService.generateSchedule(startDate, endDate);
   }
 }
