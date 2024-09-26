@@ -1,4 +1,5 @@
 import {
+  Column,
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
@@ -12,6 +13,12 @@ import { ShiftEntity } from "../shift/shift.entity";
 export class ScheduleEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: "date" })
+  startDate: Date;
+
+  @Column({ type: "date" })
+  endDate: Date;
 
   @OneToMany(() => ShiftEntity, (shift) => shift.schedule, {
     eager: true,

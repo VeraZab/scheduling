@@ -103,11 +103,22 @@ function App() {
       <div className="card">
         <h2>Schedules</h2>
         <div>TODO</div>
+        <button
+          onClick={() => {
+            const startDate = new Date();
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            // Just adding start and end date as fillers here even if they're
+            // not really used as specific dates are not of interest here
+            // but in the future when they are this could be useful
+            api.default.generateSchedule(startDate, endDate);
+          }}
+        >
+          GENERATE SCHEDULE
+        </button>
         {schedules &&
           schedules.map((schedule: any) => (
-            <div className="schedule" key={schedule.id}>
-              {/* TODO: Display table of available schedules */}
-            </div>
+            <div className="schedule" key={schedule.id}></div>
           ))}
       </div>
     </>
