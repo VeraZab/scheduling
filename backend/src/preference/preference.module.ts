@@ -9,6 +9,6 @@ import { NurseEntity } from "../nurse/nurse.entity";
   imports: [TypeOrmModule.forFeature([PreferenceEntity, NurseEntity])],
   providers: [PreferenceService],
   controllers: [PreferenceController],
-  exports: [TypeOrmModule],
+  exports: [PreferenceService, TypeOrmModule],
 })
 export class PreferenceModule {}
