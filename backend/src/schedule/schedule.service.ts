@@ -33,6 +33,17 @@ export class ScheduleService {
     await this.scheduleRepository.save(newSchedule);
 
     const requirements = await this.getScheduleRequirements();
+    // make a hash of requirements to more easily lookup the number of
+    // required nurses for each shift
+    const easyLookupRequirements = requirements.reduce(
+      (acc: any, curr: any) => {
+        const { dayOfWeek, shift, nursesRequired } = curr;
+        if (!acc[dayOfWeek]) acc[dayOfWeek] = {};
+        acc[dayOfWeek][shift] = nursesRequired;
+        return acc;
+      },
+      {}
+    );
     const totalShiftsAvailable = requirements.reduce(
       (total: number, req: ShiftRequirements) => {
         return total + req.nursesRequired;
@@ -43,25 +54,25 @@ export class ScheduleService {
     const fairNumShiftsPerNurse = Math.floor(
       totalShiftsAvailable / nurses.length
     );
+
     // shuffle the nurses array to give everyone a fair chance of being first considered
     // for priority treatment
     const shuffledNurses = shuffleArray(nurses);
-    const shifts: Partial<ShiftEntity>[] = [];
+    // Keep track of number of times a nurse is assigned to not over assign them
     const nurseShiftCounter = nurses.reduce((acc: any, nurse: any) => {
       acc[nurse.id] = 0;
       return acc;
     }, {});
-    const easyLookupRequirements = requirements.reduce(
-      (acc: any, curr: any) => {
-        const { dayOfWeek, shift, nursesRequired } = curr;
-        if (!acc[dayOfWeek]) acc[dayOfWeek] = {};
-        acc[dayOfWeek][shift] = nursesRequired;
-        return acc;
-      },
-      {}
-    );
+    // Track which nurse is assigned to which shift for a given day to not double book
+    // same nurse on same day
+    const nurseDayAssignment: {
+      [key: number]: { [key in DayOfWeek]?: ShiftType };
+    } = {};
 
-    const scheduleVerification = {
+    const shifts: Partial<ShiftEntity>[] = [];
+
+    // Keep track of the number of shifts assigned each day to compare with requirements
+    const assignedShifts = {
       Monday: {
         day: 0,
         night: 0,
@@ -101,7 +112,8 @@ export class ScheduleService {
 
       nursePreferences.forEach((shift) => {
         if (
-          scheduleVerification[shift.dayOfWeek][shift.shiftType] <
+          !nurseDayAssignment[nurse.id]?.[shift.dayOfWeek] &&
+          assignedShifts[shift.dayOfWeek][shift.shiftType] <
             easyLookupRequirements[shift.dayOfWeek][shift.shiftType] &&
           nurseShiftCounter[nurse.id] < fairNumShiftsPerNurse
         ) {
@@ -111,24 +123,34 @@ export class ScheduleService {
             type: shift.shiftType,
             schedule: newSchedule,
           });
-          scheduleVerification[shift.dayOfWeek][shift.shiftType] += 1;
+          // Mark that the nurse has a shift on this day
+          nurseDayAssignment[nurse.id] = {
+            ...nurseDayAssignment[nurse.id],
+            [shift.dayOfWeek]: shift.shiftType,
+          };
+          assignedShifts[shift.dayOfWeek][shift.shiftType] += 1;
           nurseShiftCounter[nurse.id] += 1;
         }
       });
     }
 
     // Check if schedule requirements are met
-    Object.keys(scheduleVerification).forEach((day) => {
-      const shiftsForDay = scheduleVerification[day as DayOfWeek];
+    Object.keys(assignedShifts).forEach((day) => {
+      const shiftsForDay = assignedShifts[day as DayOfWeek];
+
       Object.keys(shiftsForDay).forEach((shiftType) => {
         const requiredNurses =
           easyLookupRequirements[day][shiftType as ShiftType];
         const assignedNurses = shiftsForDay[shiftType as ShiftType];
+
         // Assign unfulfilled shifts to nurses who haven't reached their fair shift count
         while (assignedNurses < requiredNurses) {
           const nurseToAssign = shuffledNurses.find(
-            (nurse) => nurseShiftCounter[nurse.id] < fairNumShiftsPerNurse
+            (nurse) =>
+              nurseShiftCounter[nurse.id] < fairNumShiftsPerNurse &&
+              !nurseDayAssignment[nurse.id]?.[day as DayOfWeek]
           );
+
           if (nurseToAssign) {
             shifts.push({
               nurse: nurseToAssign,
@@ -136,20 +158,38 @@ export class ScheduleService {
               type: shiftType as ShiftType,
               schedule: newSchedule,
             });
-            scheduleVerification[day as DayOfWeek][shiftType as ShiftType] += 1;
+
+            // Mark that the nurse has a shift on this day
+            nurseDayAssignment[nurseToAssign.id] = {
+              ...nurseDayAssignment[nurseToAssign.id],
+              [day as DayOfWeek]: shiftType as ShiftType,
+            };
+            // add a shift to that nurse's total shift counter
             nurseShiftCounter[nurseToAssign.id] += 1;
+            // Increase the number of assigned shifts for that day and shiftType
+            assignedShifts[day as DayOfWeek][shiftType as ShiftType] += 1;
           } else {
             // If all nurses have fair shifts, assign a random nurse to the remaining shift
-            const randomNurse =
-              shuffledNurses[Math.floor(Math.random() * shuffledNurses.length)];
-            shifts.push({
-              nurse: randomNurse,
-              dayOfWeek: day as DayOfWeek,
-              type: shiftType as ShiftType,
-              schedule: newSchedule,
-            });
-            scheduleVerification[day as DayOfWeek][shiftType as ShiftType] += 1;
-            nurseShiftCounter[randomNurse.id] += 1;
+            const randomNurse = shuffledNurses.find(
+              (nurse) => !nurseDayAssignment[nurse.id]?.[day as DayOfWeek]
+            );
+
+            if (randomNurse) {
+              shifts.push({
+                nurse: randomNurse,
+                dayOfWeek: day as DayOfWeek,
+                type: shiftType as ShiftType,
+                schedule: newSchedule,
+              });
+
+              // Mark that the nurse has a shift on this day
+              nurseDayAssignment[randomNurse.id] = {
+                ...nurseDayAssignment[randomNurse.id],
+                [day as DayOfWeek]: shiftType as ShiftType,
+              };
+              nurseShiftCounter[randomNurse.id] += 1;
+              assignedShifts[day as DayOfWeek][shiftType as ShiftType] += 1;
+            }
           }
         }
       });
