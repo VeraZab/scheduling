@@ -23,10 +23,7 @@ export class ScheduleController {
   }
 
   @Post()
-  async generateSchedule(
-    @Body("startDate") startDate: Date,
-    @Body("endDate") endDate: Date
-  ): Promise<any> {
-    return this.scheduleService.generateSchedule(startDate, endDate);
+  async generateSchedule(): Promise<any> {
+    return this.scheduleService.generateSchedule();
   }
 }

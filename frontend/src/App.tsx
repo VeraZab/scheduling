@@ -105,17 +105,12 @@ function App() {
         <div>TODO</div>
         <button
           onClick={() => {
-            const startDate = new Date();
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
-            // Just adding start and end date as fillers here even if they're
-            // not really used as specific dates are not of interest here
-            // but in the future when they are this could be useful
-            api.default.generateSchedule(startDate, endDate);
+            api.default.generateSchedule();
           }}
         >
           GENERATE SCHEDULE
         </button>
+        <button onClick={() => {}}>VIEW SCHEDULE</button>
         {schedules &&
           schedules.map((schedule: any) => (
             <div className="schedule" key={schedule.id}></div>

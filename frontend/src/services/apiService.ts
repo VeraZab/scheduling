@@ -44,11 +44,8 @@ export default {
   },
 
   // Schedule endpoints
-  generateSchedule: async (startDate: Date, endDate: Date) => {
-    const { data } = await instance.post(`/schedules`, {
-      startDate,
-      endDate,
-    });
+  generateSchedule: async () => {
+    const { data } = await instance.post(`/schedules`);
     return data;
   },
   getSchedules: async () => {

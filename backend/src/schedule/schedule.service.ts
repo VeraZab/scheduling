@@ -27,7 +27,7 @@ export class ScheduleService {
     private readonly nurseService: NurseService
   ) {}
 
-  async generateSchedule(startDate: Date, endDate: Date): Promise<any> {
+  async generateSchedule(): Promise<any> {
     // Create a new schedule entity
     const newSchedule = this.scheduleRepository.create();
     await this.scheduleRepository.save(newSchedule);
