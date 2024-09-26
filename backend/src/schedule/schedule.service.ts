@@ -19,7 +19,7 @@ export class ScheduleService {
     @InjectRepository(ScheduleEntity)
     private readonly scheduleRepository: Repository<ScheduleEntity>,
 
-    @InjectRepository(ShiftEntity) // Add this line to inject shiftRepository
+    @InjectRepository(ShiftEntity)
     private readonly shiftRepository: Repository<ShiftEntity>,
 
     private readonly shiftService: ShiftService,
@@ -135,16 +135,15 @@ export class ScheduleService {
     }
 
     // Check if schedule requirements are met
-    Object.keys(assignedShifts).forEach((day) => {
-      const shiftsForDay = assignedShifts[day as DayOfWeek];
+    Object.keys(easyLookupRequirements).forEach((day) => {
+      const shiftsForDay = easyLookupRequirements[day as DayOfWeek];
 
       Object.keys(shiftsForDay).forEach((shiftType) => {
-        const requiredNurses =
-          easyLookupRequirements[day][shiftType as ShiftType];
-        const assignedNurses = shiftsForDay[shiftType as ShiftType];
-
         // Assign unfulfilled shifts to nurses who haven't reached their fair shift count
-        while (assignedNurses < requiredNurses) {
+        while (
+          assignedShifts[day as DayOfWeek][shiftType as ShiftType] <
+          easyLookupRequirements[day][shiftType as ShiftType]
+        ) {
           const nurseToAssign = shuffledNurses.find(
             (nurse) =>
               nurseShiftCounter[nurse.id] < fairNumShiftsPerNurse &&
