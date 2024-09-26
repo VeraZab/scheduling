@@ -122,3 +122,11 @@ th {
 .scheduleTableContainer {
   width: 100%;
 }
+
+.scheduleTableContainer thead th:not(:first-child) {
+  text-align: center;
+}
+
+.scheduleContainer tr.total {
+  background-color: #f2e7c6;
+}

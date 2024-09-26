@@ -1,28 +1,39 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as api from "../services/apiService";
 import { days } from "../constants/schedule";
 
-const NursePreferences = ({ id, name }) => {
+interface NursePreferredShifts {
+  Monday: string;
+  Tuesday: string;
+  Wednesday: string;
+  Thursday: string;
+  Friday: string;
+  Saturday: string;
+  Sunday: string;
+}
+
+const NursePreferences = ({ id, name }: { id: number; name: string }) => {
   // state for show depending on button click on the nurse itself to show details page
   const [showNursePreferredShifts, setShowNursePreferredShifts] =
     useState(false);
   // preferred shifts represents nurse preferences for the week in a format that makes it easy to render
-  const [nursePreferredShifts, setNursePreferredShifts] = useState({
-    Monday: "",
-    Tuesday: "",
-    Wednesday: "",
-    Thursday: "",
-    Friday: "",
-    Saturday: "",
-    Sunday: "",
-  });
+  const [nursePreferredShifts, setNursePreferredShifts] =
+    useState<NursePreferredShifts>({
+      Monday: "",
+      Tuesday: "",
+      Wednesday: "",
+      Thursday: "",
+      Friday: "",
+      Saturday: "",
+      Sunday: "",
+    });
   const shifts = ["day", "night"];
 
   const handleClick = () => {
     setShowNursePreferredShifts((show) => !show);
   };
 
-  const handleSubmitPreferences = (event) => {
+  const handleSubmitPreferences = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const setPreferences = async () => {
@@ -94,7 +105,11 @@ const NursePreferences = ({ id, name }) => {
                             type="checkbox"
                             name={day}
                             value={shift}
-                            checked={nursePreferredShifts[day] === shift}
+                            checked={
+                              nursePreferredShifts[
+                                day as keyof NursePreferredShifts
+                              ] === shift
+                            }
                             onChange={(e) => {
                               setNursePreferredShifts({
                                 ...nursePreferredShifts,

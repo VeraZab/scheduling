@@ -9,7 +9,7 @@ function App() {
   const [nurses, setNurses] = useState<unknown[] | null>(null);
   const [requirements, setRequirements] = useState<unknown[] | null>(null);
   const [schedules, setSchedules] = useState<unknown[] | null>(null);
-  const [selectedScheduleId, setSelectedScheduleId] = useState<string>("");
+  const [selectedScheduleId, setSelectedScheduleId] = useState<number>(null);
 
   useEffect(() => {
     const fetchNurses = async () => {
@@ -113,7 +113,7 @@ function App() {
               onChange={(event) => {
                 setSelectedScheduleId(parseInt(event.target.value));
               }}
-              value={selectedScheduleId.toString()}
+              value={selectedScheduleId}
             >
               <option value="">Select Schedule</option>
               {schedules &&

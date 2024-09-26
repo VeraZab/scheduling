@@ -27,12 +27,13 @@ export class ScheduleService {
     private readonly nurseService: NurseService
   ) {}
 
-  async generateSchedule(): Promise<any> {
+  async generateSchedule(): Promise<ScheduleEntity> {
     // Create a new schedule entity
     const newSchedule = this.scheduleRepository.create();
     await this.scheduleRepository.save(newSchedule);
 
     const requirements = await this.getScheduleRequirements();
+
     // make a hash of requirements to more easily lookup the number of
     // required nurses for each shift
     const easyLookupRequirements = requirements.reduce(
@@ -104,7 +105,7 @@ export class ScheduleService {
     };
 
     // Try to give each nurse their prefered schedule if its available
-    // and they didn't max out their shift number
+    // and they didn't max out their fair shift number
     for (const nurse of nurses) {
       const nursePreferences = await this.preferenceService.getPreferences(
         nurse.id
@@ -112,6 +113,7 @@ export class ScheduleService {
 
       nursePreferences.forEach((shift) => {
         if (
+          // nurse wasn't already assigned on the day
           !nurseDayAssignment[nurse.id]?.[shift.dayOfWeek] &&
           assignedShifts[shift.dayOfWeek][shift.shiftType] <
             easyLookupRequirements[shift.dayOfWeek][shift.shiftType] &&
@@ -198,6 +200,9 @@ export class ScheduleService {
     await this.shiftRepository.save(shifts);
 
     // Return the created schedule
+    // I'm returning the full schedule with all the shift and nurse relations
+    // This is arguably not the most restful way as it's returning a lot of info alongside the schedule
+    // We can discuss : )
     const schedule = await this.scheduleRepository.findOne({
       where: { id: newSchedule.id },
       relations: ["shifts", "shifts.nurse"],
@@ -210,11 +215,11 @@ export class ScheduleService {
     return schedule;
   }
 
-  async getSchedules(): Promise<any> {
+  async getSchedules(): Promise<ScheduleEntity[]> {
     return this.scheduleRepository.find();
   }
 
-  async getScheduleById(id: number): Promise<any> {
+  async getScheduleById(id: number): Promise<ScheduleEntity> {
     return this.scheduleRepository.findOneByOrFail({ id });
   }
 

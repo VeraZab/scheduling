@@ -3,6 +3,7 @@ import { days } from "../constants/schedule";
 interface ScheduleDisplayProps {
   schedule: any;
   nurses: unknown;
+  requirements: unknown;
 }
 
 const indexToDayMap = {
@@ -31,7 +32,7 @@ const ScheduleDetails: React.FC<ScheduleDisplayProps> = ({
     return <div>Loading...</div>;
   }
 
-  const scheduleByNurse = schedule.shifts.reduce((acc, curr, index) => {
+  const scheduleByNurse = schedule.shifts.reduce((acc, curr) => {
     const currentShiftIndex = Object.values(indexToDayMap).findIndex(
       (v) => v === curr.dayOfWeek
     );
@@ -69,7 +70,7 @@ const ScheduleDetails: React.FC<ScheduleDisplayProps> = ({
           <tr>
             <th>{""}</th>
             {days.map((day) => (
-              <th key={day} colSpan={2} style={{ textAlign: "center" }}>
+              <th key={day} colSpan={2}>
                 {day.substring(0, 3)}
               </th>
             ))}
@@ -77,9 +78,7 @@ const ScheduleDetails: React.FC<ScheduleDisplayProps> = ({
           <tr>
             <th>Nurses</th>
             {new Array(days.length * 2).fill(null).map((_, index) => (
-              <th key={index} style={{ textAlign: "center" }}>
-                {index % 2 === 0 ? "D" : "N"}
-              </th>
+              <th key={index}>{index % 2 === 0 ? "D" : "N"}</th>
             ))}
           </tr>
         </thead>
@@ -102,18 +101,20 @@ const ScheduleDetails: React.FC<ScheduleDisplayProps> = ({
                 )}
               </tr>
             ))}
-          <tr style={{ backgroundColor: "#f2e7c6" }}>
+          <tr className="total">
             <td>Total Nurses Assigned</td>
             {new Array(days.length * 2).fill(null).map((_, index) => {
-              const currentDay = indexToDayMap[index];
+              const currentDay =
+                indexToDayMap[index as keyof typeof indexToDayMap];
               const shiftType = index % 2 === 0 ? "day" : "night";
               return <td>{easyReadNursesAssigned[currentDay][shiftType]}</td>;
             })}
           </tr>
-          <tr style={{ backgroundColor: "#f2e7c6" }}>
+          <tr className="total">
             <td>Total Nurses Required</td>
             {new Array(days.length * 2).fill(null).map((_, index) => {
-              const currentDay = indexToDayMap[index];
+              const currentDay =
+                indexToDayMap[index as keyof typeof indexToDayMap];
               const shiftType = index % 2 === 0 ? "day" : "night";
               return <td>{easyReadRequirements[currentDay][shiftType]}</td>;
             })}

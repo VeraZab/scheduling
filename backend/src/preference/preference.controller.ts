@@ -11,7 +11,7 @@ export class PreferenceController {
   async setPreferences(
     @Param("nurseId") nurseId: number,
     @Body("preferences")
-    preferences: { dayOfWeek: DayOfWeek; shiftType: ShiftType }[] // Use ShiftType for validation
+    preferences: { dayOfWeek: DayOfWeek; shiftType: ShiftType }[]
   ): Promise<PreferenceEntity[]> {
     return this.preferenceService.setPreferences(nurseId, preferences);
   }

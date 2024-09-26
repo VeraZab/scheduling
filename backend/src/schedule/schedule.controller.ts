@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Param,
-  Body,
-  NotImplementedException,
-} from "@nestjs/common";
+import { Controller, Post, Get, Param } from "@nestjs/common";
 import { ScheduleService } from "./schedule.service";
 
 @Controller("schedules")

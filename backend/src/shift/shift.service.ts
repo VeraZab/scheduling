@@ -16,6 +16,8 @@ export class ShiftService {
     return this.shiftRepository.find();
   }
 
+  // I didn't end up using these calls, so not implemented
+
   async getShiftsByNurse(nurseId: string) {
     throw new NotImplementedException();
   }

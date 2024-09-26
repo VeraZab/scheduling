@@ -44,6 +44,7 @@ export class PreferenceService {
 
   async getPreferences(nurseId: number): Promise<PreferenceEntity[]> {
     const nurse = await this.nurseRepository.findOneByOrFail({ id: nurseId });
+
     if (!nurse) {
       throw new Error(`Nurse with ID ${nurseId} not found`);
     }
