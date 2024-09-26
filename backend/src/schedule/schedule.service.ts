@@ -196,6 +196,18 @@ export class ScheduleService {
 
     // Save the shifts in the database
     await this.shiftRepository.save(shifts);
+
+    // Return the created schedule
+    const schedule = await this.scheduleRepository.findOne({
+      where: { id: newSchedule.id },
+      relations: ["shifts", "shifts.nurse"],
+    });
+
+    if (!schedule) {
+      throw new Error("Schedule not found");
+    }
+
+    return schedule;
   }
 
   async getSchedules(): Promise<any> {

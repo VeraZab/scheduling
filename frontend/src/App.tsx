@@ -3,20 +3,13 @@ import * as api from "./services/apiService";
 import m7Logo from "/Logo-black.png";
 import "./App.css";
 import NursePreferences from "./components/NursePreferences";
+import ScheduleDetails from "./components/ScheduleDetails";
 
 function App() {
   const [nurses, setNurses] = useState<unknown[] | null>(null);
   const [requirements, setRequirements] = useState<unknown[] | null>(null);
   const [schedules, setSchedules] = useState<unknown[] | null>(null);
-  const days = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
+  const [selectedScheduleId, setSelectedScheduleId] = useState<string>("");
 
   useEffect(() => {
     const fetchNurses = async () => {
@@ -36,24 +29,24 @@ function App() {
     fetchRequirements().catch(console.error);
   }, []);
 
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      const schedules = await api.default.getSchedules();
+      setSchedules(schedules);
+    };
+
+    fetchSchedules().catch(console.error);
+  }, []);
+
   return (
-    <>
+    <div className="contentContainer">
       <div>
         <a href="https://m7health.com" target="_blank">
           <img src={m7Logo} className="logo" alt="M7 Health logo" />
         </a>
       </div>
-      <h1>M7 Health scheduling exercise</h1>
       <div className="card">
-        Check the README for guidance on how to complete this exercise. Find
-        inspiration{" "}
-        <a href="https://www.m7health.com/product" target="_blank">
-          on M7's site
-        </a>
-        .
-      </div>
-      <div className="card">
-        <h2>Nurses</h2>
+        <h2>Nurse Preferences</h2>
         <table>
           <thead>
             <tr>
@@ -67,11 +60,7 @@ function App() {
                 <tr key={nurse.id}>
                   <td>{nurse.id}</td>
                   <td>
-                    <NursePreferences
-                      id={nurse.id}
-                      name={nurse.name}
-                      days={days}
-                    />
+                    <NursePreferences id={nurse.id} name={nurse.name} />
                   </td>
                 </tr>
               ))}
@@ -102,21 +91,66 @@ function App() {
       </div>
       <div className="card">
         <h2>Schedules</h2>
-        <div>TODO</div>
-        <button
-          onClick={() => {
-            api.default.generateSchedule();
-          }}
-        >
-          GENERATE SCHEDULE
-        </button>
-        <button onClick={() => {}}>VIEW SCHEDULE</button>
-        {schedules &&
-          schedules.map((schedule: any) => (
-            <div className="schedule" key={schedule.id}></div>
-          ))}
+        <div className="scheduleControlsContainer">
+          <button
+            onClick={async () => {
+              const newSchedule = await api.default.generateSchedule();
+              const newSchedules = schedules
+                ? [...schedules, newSchedule]
+                : [newSchedule];
+              setSchedules(newSchedules);
+              setSelectedScheduleId(newSchedule.id);
+            }}
+          >
+            GENERATE SCHEDULE
+          </button>
+          <div>
+            <select
+              className="scheduleDropdown"
+              onChange={(event) => {
+                setSelectedScheduleId(event.target.value);
+              }}
+              value={selectedScheduleId}
+            >
+              <option value="">Select Schedule</option>
+              {schedules &&
+                schedules.map((schedule) => (
+                  <option key={schedule.id} value={schedule.id}>
+                    {`Schedule id: ${schedule.id}`}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="scheduleContainer">
+          {schedules &&
+            selectedScheduleId &&
+            schedules.find((sc) => sc.id.toString() === selectedScheduleId) && (
+              <ScheduleDetails
+                schedule={schedules.find(
+                  (sc) => sc.id.toString() === selectedScheduleId
+                )}
+                nurses={nurses}
+                requirements={requirements}
+              />
+            )}
+
+          {schedules && schedules.length != 0 && !selectedScheduleId && (
+            <div className="scheduleMessageContainer">
+              Please select a schedule to display
+            </div>
+          )}
+
+          {!schedules ||
+            (schedules.length === 0 && (
+              <div className="scheduleMessageContainer">
+                Please generate a schedule
+              </div>
+            ))}
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 

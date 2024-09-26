@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import * as api from "../services/apiService";
+import { days } from "../constants/schedule";
 
-const NursePreferences = ({ id, name, days }) => {
+const NursePreferences = ({ id, name }) => {
   // state for show depending on button click on the nurse itself to show details page
   const [showNursePreferredShifts, setShowNursePreferredShifts] =
     useState(false);

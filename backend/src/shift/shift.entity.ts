@@ -30,7 +30,7 @@ export class ShiftEntity {
   @Column({ type: "varchar", length: 10 })
   type: ShiftType;
 
-  @ManyToOne(() => NurseEntity, (nurse) => nurse.shifts)
+  @ManyToOne(() => NurseEntity, (nurse) => nurse.shifts, { eager: true })
   nurse: NurseEntity;
 
   @ManyToOne(() => ScheduleEntity, (schedule) => schedule.shifts)
