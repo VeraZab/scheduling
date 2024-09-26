@@ -95,10 +95,13 @@ function App() {
           <button
             onClick={async () => {
               const newSchedule = await api.default.generateSchedule();
-              const newSchedules = schedules
-                ? [...schedules, newSchedule]
-                : [newSchedule];
-              setSchedules(newSchedules);
+
+              setSchedules((prevSchedules) => {
+                return prevSchedules
+                  ? [...prevSchedules, newSchedule]
+                  : [newSchedule];
+              });
+
               setSelectedScheduleId(newSchedule.id);
             }}
           >
@@ -108,9 +111,9 @@ function App() {
             <select
               className="scheduleDropdown"
               onChange={(event) => {
-                setSelectedScheduleId(event.target.value);
+                setSelectedScheduleId(parseInt(event.target.value));
               }}
-              value={selectedScheduleId}
+              value={selectedScheduleId.toString()}
             >
               <option value="">Select Schedule</option>
               {schedules &&
@@ -126,11 +129,9 @@ function App() {
         <div className="scheduleContainer">
           {schedules &&
             selectedScheduleId &&
-            schedules.find((sc) => sc.id.toString() === selectedScheduleId) && (
+            schedules.find((sc) => sc.id === selectedScheduleId) && (
               <ScheduleDetails
-                schedule={schedules.find(
-                  (sc) => sc.id.toString() === selectedScheduleId
-                )}
+                schedule={schedules.find((sc) => sc.id === selectedScheduleId)}
                 nurses={nurses}
                 requirements={requirements}
               />
